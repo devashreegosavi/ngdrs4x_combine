@@ -118,7 +118,7 @@ class GeneralinfoController extends AppController {
         
             $generalinfodet = $this->getTableLocator()->get('Generalinformation');
             $gen_add = $generalinfodet->newEmptyEntity();
-            $this->set('$gen_add', $gen_add);
+            $this->set('gen_add', $gen_add);
             
             $setdata = $this->set_value_tosave_generalinfo($this->request->getData(), $fields['user_id'], $fields['stateid'], $usertype);
             //pr($setdata);

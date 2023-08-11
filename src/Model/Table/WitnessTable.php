@@ -11,5 +11,5 @@ class WitnessTable extends Table
         $this->setTable('ngdrstab_trn_witness');
         $this->setPrimaryKey('witness_id');
     }
-    
+ 
 }

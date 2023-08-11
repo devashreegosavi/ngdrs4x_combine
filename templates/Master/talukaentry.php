@@ -3,6 +3,7 @@ echo $this->element("Helper/jqueryhelper");
 ?>
 <script type="text/javascript">
     var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
+    
     $(document).ready(function () {
         
          $('#datalist').dataTable({

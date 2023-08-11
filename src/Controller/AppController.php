@@ -353,4 +353,34 @@ $connection = ConnectionManager::get('default');
         $documentstatus->save($dstatus);
         return true;
     }
+    
+    public function restrict_edit_after_submit($token = NULL){
+        $role_id = $this->request->getSession()->read('Auth.role_id');
+        if (!empty($role_id)) {
+            if ($role_id == 1) {
+                $getresultdt = $this->fetchTable('Generalinformation')->find('all')
+                                    ->where(['token_no =' => $token])
+                                    ->toArray(); 
+                if (!empty($getresultdt)) {
+                    $last_status_id = $getresultdt[0]['last_status_id'];
+                    if ($last_status_id != 1) {
+                        $this->Flash->success(__('You cannot Edit Document After Submission, Please take Appointment...!!!'));
+                        return $this->redirect(['controller' => 'Appointment', 'action' => 'appointment']);
+                    }
+                }
+            }
+        }
+    }
+
+    public function get_name_format(){
+        $getnameformat = $this->fetchTable('ConfRegBoolInfo')->getconfvalueresult(2);
+        $nameformat = $getnameformat['conf_bool_value'];
+        return $nameformat;
+    }
+    function enc($str) {
+        $key = "";
+        $enc = openssl_encrypt($str, 'bf-ecb', $key, true);
+        $final_str = (bin2hex($enc));
+        return ($final_str);
+    }
 }
