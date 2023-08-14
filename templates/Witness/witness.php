@@ -2,6 +2,19 @@
 echo $this->element("Helper/jqueryhelper");
 ?>
 <script type="text/javascript">
+
+var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
+    $(document).ready(function () {
+        //$('#datalist').DataTable();
+        
+        $('#datalist').dataTable({
+        "iDisplayLength": 5,
+                "aLengthMenu": [[5, 10, 15, 20, - 1], [5, 10, 15, 20, "All"]]
+        });
+        
+    });
+
+
      $(document).ready(function () {
 
         /*$.post(host + 'Citizenentry/get_witness_feilds', {csrftoken: csrftoken}, function (fields)
@@ -56,7 +69,7 @@ echo $this->element("Helper/jqueryhelper");
             <div class="form-group row">
                 <label for="inputEmail3" class="col-sm-2 col-form-label"><?php echo __('lbltokenno'); ?></label>
                 <div class="col-sm-4">
-                    <?= $this->Form->control('s_token', ['id' => 's_token','value'=> $Selectedtoken, 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off', 'readonly' => 'readonly']) ?>
+                    <?= $this->Form->control('token_no', ['id' => 'token_no','value'=> $Selectedtoken, 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off', 'readonly' => 'readonly']) ?>
                 </div>
                 <div class="col-sm-4">
                     &nbsp;
@@ -89,4 +102,40 @@ echo $this->element("Helper/jqueryhelper");
 </div>
 
 
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    Witness Details
+                </div>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover text-nowrap"  id="datalist">
+                    <thead>
+                        <tr>
+                            <th>Witness Name</th>
+                            <th>Witness Father/Husband Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php for ($i = 0; $i < count($witness); $i++) { ?>
+                        <tr>
+                            <td><?php echo $witness[$i]['witness_full_name_en'];?></td>
+                            <td><?php echo $witness[$i]['father_full_name_en'];?></td>
+                            <td>
+                            <a class='btn btn-info btn-xs' href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+                            <a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a>
+                            </td>
+                        </tr>
+                        <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 <?= $this->Form->end() ?>

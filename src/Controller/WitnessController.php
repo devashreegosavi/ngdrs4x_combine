@@ -58,7 +58,7 @@ class WitnessController extends AppController {
                                     ->find('all')
                                     ->where(['token_no =' => $Selectedtoken])
                                     ->toArray(); 
-
+        //pr($witness);exit;
         $this->restrict_edit_after_submit($Selectedtoken);
         if (!is_numeric($Selectedtoken)) {
             $this->Flash->success(__('Saved Successfully'));
@@ -160,12 +160,39 @@ class WitnessController extends AppController {
     public function save_witness($reqdata,$data, $Selectedtoken, $state_id, $user_id, $hfid, $session_usertype){
 
             $witnessdet = $this->getTableLocator()->get('Witness');
+            $witness_add = $witnessdet->newEmptyEntity();
+            $this->set('witness_add', $witness_add);
             $witnessfieldsdet = $this->getTableLocator()->get('WitnessFields');       
             $pan = isset($reqdata['pan_no']) ? ($reqdata['pan_no']) : ('');
             $mobile = isset($reqdata['mobile_no']) ? ($reqdata['mobile_no']) : ('');
             $uid = isset($reqdata['uid_no']) ? ($reqdata['uid_no']) : ('');
             $email = isset($reqdata['email_id']) ? ($reqdata['email_id']) : (''); 
 
+            //pr($state_id);
+            //pr($user_id);
+       
+
+            unset($reqdata['data']); 
+            //pr($reqdata);
+            $reqdata['witness_full_name_en']=$data['witness_full_name_en'];
+            $reqdata['state_id']=$state_id;
+            $reqdata['user_id']=$user_id;
+            if(isset($session_usertype)){
+                $reqdata['user_type']=$session_usertype;
+            }
+
+            if (isset($hfid) && $hfid!='') {
+                echo 'set';
+                $action = 'U';
+                //update record with id= hfid
+            }else{
+                echo 'unset';
+                $action = 'S';
+                $witness_add = $witnessdet->patchEntity($witness_add, $reqdata);
+                pr($witness_add);
+                $witnessdet->save($witness_add);
+                return true;
+            }
             
     }
     public function getwitnessfeilds(){
