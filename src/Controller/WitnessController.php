@@ -68,8 +68,8 @@ class WitnessController extends AppController {
             return $this->redirect(['controller' => 'Appointment', 'action' => 'appointment']);
         }
 
-        $popupstatus = $actiontypeval = $hfid = $hfupdateflag = $hfactionval = NULL;
-        $this->set(compact('popupstatus', 'actiontypeval', 'hfid','hfupdateflag','hfactionval','state_id','witness','lang'));
+        $popupstatus = $actiontypeval = $hfid = $hfupdateflag = $hfactionval = $witness_id = NULL;
+        $this->set(compact('popupstatus', 'actiontypeval', 'hfid','hfupdateflag','hfactionval','state_id','witness','lang','witness_id'));
      
         
         $errorlist = $NGDRSErrorCode->find('list', [
@@ -92,8 +92,11 @@ class WitnessController extends AppController {
 
         if ($this->request->is('post')) {
             $reqdata = $this->request->getData();
-            pr($reqdata);
+            //pr($reqdata);exit;
             $hfid = $reqdata['hfid'];
+            $witness_id = $reqdata['witness_id'];
+            $hfupdateflag = $reqdata['hfupdateflag'];
+
             $village_id = $reqdata['village_id'];
             $fieldlist = $this->fetchTable('WitnessFields')->fieldlist($lang,$village_id);
             if (isset($reqdata['witness_full_name_en'])){
@@ -146,19 +149,27 @@ class WitnessController extends AppController {
                     $reqdata['org_created']=$date('Y-m-d H:i:s');
                 }
             }
-            $this->save_witness($reqdata,$data, $Selectedtoken, $state_id, $user_id, $hfid, $session_usertype);
+            $this->save_witness($reqdata,$data, $Selectedtoken, $state_id, $user_id, $hfid, $session_usertype,$witness_id);
             
             //pr($fieldlist);
             // $reqdata_send['witness_fields'] = $reqdata;
             //$errarr = $this->validatedata($reqdata, $fieldlist);
             //pr($errarr);
+            if($hfid!='')
+            {
+                $this->Flash->success(__('Witness Details Updated Successfully'));
+            }
+            else{
+                $this->Flash->success(__('Witness Details Saved Successfully'));
+            }
+            return $this->redirect(['controller' => 'Witness', 'action' => 'witness']);
             
-            exit;
         }
     }
     
-    public function save_witness($reqdata,$data, $Selectedtoken, $state_id, $user_id, $hfid, $session_usertype){
+    public function save_witness($reqdata,$data, $Selectedtoken, $state_id, $user_id, $hfid, $session_usertype,$witness_id){
 
+        //pr($hfid);exit;
             $witnessdet = $this->getTableLocator()->get('Witness');
             $witness_add = $witnessdet->newEmptyEntity();
             $this->set('witness_add', $witness_add);
@@ -182,11 +193,19 @@ class WitnessController extends AppController {
             }
 
             if (isset($hfid) && $hfid!='') {
-                echo 'set';
+                //echo 'set';exit;
                 $action = 'U';
+                $dataid = ['id' => $hfid]; 
+                $datawitnessid = ['witness_id' => $witness_id]; 
+                $witness_add = $witnessdet->patchEntity($witness_add, $reqdata);
+                $witness_add = $witnessdet->patchEntity($witness_add, $dataid);
+                $witness_add = $witnessdet->patchEntity($witness_add, $datawitnessid);
+                //pr($witness_add);exit;
+                $witnessdet->save($witness_add);
+                return true;
                 //update record with id= hfid
             }else{
-                echo 'unset';
+                //echo 'unset';
                 $action = 'S';
                 $witness_add = $witnessdet->patchEntity($witness_add, $reqdata);
                 pr($witness_add);
@@ -196,8 +215,12 @@ class WitnessController extends AppController {
             
     }
     public function getwitnessfeilds(){
+
+        $data = $this->request->getData();
+        
         $lang = $this->request->getSession()->read('Config.language');
         $Selectedtoken = $this->request->getSession()->read('Selectedtoken');
+        $Selectedtoken='202300000004';
         $generalinfodet = $this->getTableLocator()->get('Generalinformation');
         $witnessfieldsdet = $this->getTableLocator()->get('WitnessFields');
         $witnessdet = $this->getTableLocator()->get('Witness');
@@ -271,8 +294,13 @@ class WitnessController extends AppController {
         ])->order(['taluka_name_en' => 'ASC'])->toArray();
         $this->set('taluka', $taluka);
         
-        $villagelist = array();
+        //$villagelist = array();
+        $villagelist = $this->fetchTable('Village')->find('list', [
+            'keyField' => 'village_id',
+            'valueField' => 'village_name_' . $lang
+        ])->order(['village_name_en' => 'ASC'])->toArray();
         $this->set('villagelist', $villagelist);
+
         $name_format = $this->fetchTable('ConfRegBoolInfo')->getconfvalueresult(15);
         $this->set('name_format', $name_format);
         
@@ -311,6 +339,21 @@ class WitnessController extends AppController {
         $this->set('fieldlistmultiform', $fieldlist);
         //pr($this->getvalidationruleset($fieldlist, TRUE));
         $this->set('result_codes', $this->getvalidationruleset($fieldlist, TRUE));
+
+
+        if (isset($data['id']) && is_numeric($data['id'])) {
+            //pr($data['id']);exit;
+            $wit_id = $data['id'];
+            $witnessarr = $this->fetchTable('Witness')
+                            ->find('all')
+                            ->where(['token_no =' => $Selectedtoken,'id' => $wit_id ])
+                            ->toArray(); 
+            //pr($witnessarr);
+            $this->set('witnessarr', $witnessarr);
+
+        }
+
+
         
     }
 

@@ -71,7 +71,14 @@ $this->Form->create($witness_fields, ['id' => 'witness_fields']);
 
     foreach ($witnessfields as $field) {
         //pr($field['field_id_name_en']);
-        
+            
+        if (isset($witnessarr) && !empty($witnessarr)) {
+            //pr($field['field_id_name_en']);
+            //pr($witnessarr[0][$field['field_id_name_en']]);
+            $witness[$field['field_id_name_en']] = $witnessarr[0][$field['field_id_name_en']];
+        }else{
+            $witness[$field['field_id_name_en']] = '';
+        }
 ?>
 
 <div class="form-group row">
@@ -79,77 +86,77 @@ $this->Form->create($witness_fields, ['id' => 'witness_fields']);
     <div class="col-sm-4">
         <?php
         switch ($field['field_id_name_en']) {
-            case 'bank_id': echo $this->Form->select($field['field_id_name_en'], $bank_master, ['empty' => '--- Select Bank ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'bank_id': echo $this->Form->select($field['field_id_name_en'], $bank_master, ['empty' => '--- Select Bank ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="bank_id_error" class="form-error"><?php // echo $errarr['bank_id_error'];              ?></span>
             <?php
             break;
-            case 'is_executer': echo $this->Form->select($field['field_id_name_en'], $executer, ['empty' => '--- Is Executer ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'is_executer': echo $this->Form->select($field['field_id_name_en'], $executer, ['empty' => '--- Is Executer ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="is_executer_error" class="form-error"><?php // echo $errarr['is_executer_error'];              ?></span>
             <?php
             break;
-            case 'salutation': echo $this->Form->select($field['field_id_name_en'], $salutation, ['empty' => '--- Select Salutation ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'salutation': echo $this->Form->select($field['field_id_name_en'], $salutation, ['empty' => '--- Select Salutation ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']] ]);
             ?>
                 <span id="salutation_id_error" class="form-error"><?php // echo $errarr['salutation_id_error'];              ?></span>
             <?php
             break;
-            case 'gender_id': echo $this->Form->select($field['field_id_name_en'], $gender, ['empty' => '--- Select Gender ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'gender_id': echo $this->Form->select($field['field_id_name_en'], $gender, ['empty' => '--- Select Gender ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="gender_id_error" class="form-error"><?php ///echo $errarr['gender_id_error'];              ?></span>
             <?php
             break;
-            case 'marital_status': echo $this->Form->select($field['field_id_name_en'], $marital_status, ['empty' => '--- Select Marital Status ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'marital_status': echo $this->Form->select($field['field_id_name_en'], $marital_status, ['empty' => '--- Select Marital Status ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="marital_status_error" class="form-error"><?php ///echo $errarr['marital_status_error'];              ?></span>
             <?php
             break;
-            case 'nationality': echo $this->Form->select($field['field_id_name_en'], $nationality, ['empty' => '--- Select Nationality ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'nationality': echo $this->Form->select($field['field_id_name_en'], $nationality, ['empty' => '--- Select Nationality ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="nationality_error" class="form-error"><?php ///echo $errarr['nationality_error'];              ?></span>
             <?php
             break;
-            case 'cast_id': echo $this->Form->select($field['field_id_name_en'], $category, ['empty' => '--- Select Caste ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'cast_id': echo $this->Form->select($field['field_id_name_en'], $category, ['empty' => '--- Select Caste ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="cast_id_error" class="form-error"><?php ///echo $errarr['cast_id_error'];              ?></span>
             <?php
             break;
-            case 'occupation_id':  echo $this->Form->select($field['field_id_name_en'], $occupation, ['empty' => '--- Select Occupation ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'occupation_id':  echo $this->Form->select($field['field_id_name_en'], $occupation, ['empty' => '--- Select Occupation ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="occupation_id_error" class="form-error"><?php //echo $errarr['occupation_id_error'];              ?></span>
             <?php
             break;
-            case 'identificationtype_id':  echo $this->Form->select($field['field_id_name_en'], $identificatontype, ['empty' => '--- Select Identification Type ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'identificationtype_id':  echo $this->Form->select($field['field_id_name_en'], $identificatontype, ['empty' => '--- Select Identification Type ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="identificationtype_id_error" class="form-error"><?php //echo $errarr['identificationtype_id_error'];              ?></span>
             <?php
             break;
-            case 'exemption_id':  echo $this->Form->select($field['field_id_name_en'], $exemption, ['empty' => '--- Select Exemption ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'exemption_id':  echo $this->Form->select($field['field_id_name_en'], $exemption, ['empty' => '--- Select Exemption ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="exemption_id_error" class="form-error"><?php //echo $errarr['exemption_id_error'];              ?></span>
             <?php
             break;
-            case 'district_id':  echo $this->Form->select($field['field_id_name_en'], $districtdata, ['empty' => '--- Select District ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'district_id':  echo $this->Form->select($field['field_id_name_en'], $districtdata, ['empty' => '--- Select District ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="district_id_error" class="form-error"><?php //echo $errarr['district_id_error'];              ?></span>
             <?php
             break;
-            case 'taluka_id':  echo $this->Form->select($field['field_id_name_en'], $taluka, ['empty' => '--- Select Taluka ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'taluka_id':  echo $this->Form->select($field['field_id_name_en'], $taluka, ['empty' => '--- Select Taluka ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="taluka_id_error" class="form-error"><?php //echo $errarr['taluka_id_error'];              ?></span>
             <?php
             break;
-            case 'village_id':  echo $this->Form->select($field['field_id_name_en'], $villagelist, ['empty' => '--- Select Village ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'village_id':  echo $this->Form->select($field['field_id_name_en'], $villagelist, ['empty' => '--- Select Village ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="village_id_error" class="form-error"><?php //echo $errarr['village_id_error'];              ?></span>
             <?php
             break;
-            case 'homevisit_flag':  echo $this->Form->select($field['field_id_name_en'], $home_visit, ['empty' => '--- Select Home Visit ---', 'class' => 'form-select', 'id' => $field['field_id_name_en']]);
+            case 'homevisit_flag':  echo $this->Form->select($field['field_id_name_en'], $home_visit, ['empty' => '--- Select Home Visit ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $witness[$field['field_id_name_en']]]);
             ?>
                 <span id="homevisit_flag_error" class="form-error"><?php //echo $errarr['homevisit_flag_error'];              ?></span>
             <?php
             break;
-            default: echo $this->Form->control($field['field_id_name_en'], ['id' => $field['field_id_name_en'], 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off']); 
+            default: echo $this->Form->control($field['field_id_name_en'], ['id' => $field['field_id_name_en'], 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off', 'value' => $witness[$field['field_id_name_en']] ]); 
             ?>
             <div  class="arrow-up witness_full_name_en_error"></div>
             <div id="witness_full_name_en_error" class="form-error witness_full_name_en_error"></div> 

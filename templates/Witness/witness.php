@@ -4,28 +4,13 @@ echo $this->element("Helper/jqueryhelper");
 <script type="text/javascript">
 
 var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
-    $(document).ready(function () {
-        //$('#datalist').DataTable();
-        
-        $('#datalist').dataTable({
-        "iDisplayLength": 5,
-                "aLengthMenu": [[5, 10, 15, 20, - 1], [5, 10, 15, 20, "All"]]
-        });
-        
-    });
-
-
      $(document).ready(function () {
 
-        /*$.post(host + 'Citizenentry/get_witness_feilds', {csrftoken: csrftoken}, function (fields)
-        {
-            if (fields) {
-                $("#witness_fields").html(fields);
-                $(document).trigger('_page_ready');
-                show_data_messages();
-                show_error_messages();
-            } 
-       });*/
+        $('#datatbl').dataTable({
+                "iDisplayLength": 10,
+                "aLengthMenu": [[5, 10, 15, 20, -1], [5, 10, 15, 20, "All"]],
+                
+        });
        
        //alert('aaa');
        $.post('<?php
@@ -40,8 +25,35 @@ var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
         
         
     });
+
+    function edit_witness(id,witness_id){
+        //alert(id);
+
+        $.post('<?php
+        echo $this->Url->build([
+            'controller' => 'Witness',
+            'action' => 'getwitnessfeilds',])
+        ?>', {'_csrfToken': $("input[name=_csrfToken]").val(), id : id}, function (data)
+        {
+            //alert(data);
+            $("#witness_fields").html(data);
+            $('#hfid').val(id);
+            $('#witness_id').val(witness_id);
+            $('#hfupdateflag').val('Y');
+
+        });
+
+    }
 </script>
 <?= $this->Form->create(NULL, ['id' => 'witness']) ?>
+
+<input type='hidden' value='<?php echo $actiontypeval; ?>' name='actiontype' id='actiontype'/>
+<input type='hidden' value='<?php echo $hfid; ?>' name='hfid' id='hfid'/>
+<input type='hidden' value='<?php echo $witness_id; ?>' name='witness_id' id='witness_id'/>
+<input type='hidden' value='<?php echo $hfupdateflag; ?>' name='hfupdateflag' id='hfupdateflag'/>
+
+
+
 <div class="card card-primary">
     <div class="card-header">
         <h3 class="card-title"><b>Witness Entry</b></h3>
@@ -88,10 +100,7 @@ var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
             </div>
         </div>
       
-        <input type='hidden' value='<?php echo $actiontypeval; ?>' name='actiontype' id='actiontype'/>
-        <input type='hidden' value='<?php echo $hfid; ?>' name='hfid' id='hfid'/>
-        <input type='hidden' value='<?php echo $hfupdateflag; ?>' name='hfupdateflag' id='hfupdateflag'/>
-
+        
         <div class="card-footer center">
             <?php //echo $this->Form->input('csrftoken', array('label' => false, 'type' => 'hidden', 'value' => $this->Session->read('csrftoken'))); ?>
             <button type="submit" id="btnadd" name="btnadd" class="btn btn-info" onclick="javascript: return formadd();"><?php echo __('btnsave'); ?></button>
@@ -100,6 +109,7 @@ var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
 
     </form>
 </div>
+
 
 
 <div class="row">
@@ -111,7 +121,7 @@ var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
                 </div>
             </div>
             <div class="card-body table-responsive">
-                <table class="table table-hover text-nowrap"  id="datalist">
+                <table class="table table-hover text-nowrap"  id="datatbl">
                     <thead>
                         <tr>
                             <th>Witness Name</th>
@@ -125,7 +135,8 @@ var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
                             <td><?php echo $witness[$i]['witness_full_name_en'];?></td>
                             <td><?php echo $witness[$i]['father_full_name_en'];?></td>
                             <td>
-                            <a class='btn btn-info btn-xs' href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+                            <input type="button" id="editdist" class="btn btn-info btn-xs" value="Edit" onclick="javascript: return edit_witness('<?php echo $witness[$i]['id']; ?>','<?php echo $witness[$i]['witness_id']; ?>');">
+                            <!--<a class='btn btn-info btn-xs' href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a>-->
                             <a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a>
                             </td>
                         </tr>
