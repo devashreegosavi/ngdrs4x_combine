@@ -41,6 +41,21 @@ var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
             $('#witness_id').val(witness_id);
             $('#hfupdateflag').val('Y');
 
+            if ($('#village_id').length && $("#village_id option:selected").val() != '') {
+                var village_id = $("#village_id option:selected").val();
+                var district_id = $("#district_id option:selected").val();
+                var taluka_id = $("#taluka_id option:selected").val();
+                //alert(village_id);
+                $.post('<?php
+                echo $this->Url->build([
+                    'controller' => 'Witness',
+                    'action' => 'getdependentaddress',])
+                ?>', {district_id: district_id,taluka_id : taluka_id,village_id : village_id,ref_id: '3',behavioral_id : '2', ref_val_id: id, ref_val_witness_id : witness_id , '_csrfToken': $("input[name=_csrfToken]").val()}, function (data)
+                {
+                    //alert(data);
+                    $('.partyaddress').html(data);
+                });
+            }
         });
 
     }
@@ -137,7 +152,10 @@ var csrfToken = <?= json_encode($this->request->getParam('_csrfToken')) ?>;
                             <td>
                             <input type="button" id="editdist" class="btn btn-info btn-xs" value="Edit" onclick="javascript: return edit_witness('<?php echo $witness[$i]['id']; ?>','<?php echo $witness[$i]['witness_id']; ?>');">
                             <!--<a class='btn btn-info btn-xs' href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a>-->
-                            <a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a>
+                            <!--<a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a>-->
+
+                            <a href="<?php echo $this->Url->build('/Witness/witnessdelete/'. $witness[$i]['witness_id']);?>" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to delete this witness ?')">Delete</a>
+
                             </td>
                         </tr>
                         <?php

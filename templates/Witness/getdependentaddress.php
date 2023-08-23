@@ -4,8 +4,19 @@
 <?php
 $flag = 1;
 
+if(isset($trnbehavioral)){
+    //pr($trnbehavioral);
+}
 foreach ($behavioralpatterns as $key => $Patterns) {
     //pr($Patterns);
+    $values_en = '';
+
+    foreach($trnbehavioral as $behavioral){
+        //pr($behavioral);
+        if($Patterns['BehavioralPatterns']['field_id'] == $behavioral['field_id']){
+            $values_en = $behavioral['field_value_en'];
+        }
+    }
 
     if ($flag) {
         $flag = 0;
@@ -22,7 +33,8 @@ foreach ($behavioralpatterns as $key => $Patterns) {
                     <div class="col-md-4">
                         <?php
                         echo $this->Form->control('id', ['type' => 'hidden','name' => 'data[property_details][pattern_id][]', 'value' => $Patterns['BehavioralPatterns']['field_id'], 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off']); 
-                        echo $this->Form->control('value', ['name' => 'data[property_details][pattern_value_en][]','id' => 'field_en' .$Patterns['BehavioralPatterns']['field_id'], 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off']); 
+                        
+                        echo $this->Form->control('value', ['name' => 'data[property_details][pattern_value_en][]','id' => 'field_en' .$Patterns['BehavioralPatterns']['field_id'], 'value' => $values_en, 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off']); 
                         ?>
                     </div> 
             </div>

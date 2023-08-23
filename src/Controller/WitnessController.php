@@ -93,6 +93,7 @@ class WitnessController extends AppController {
         if ($this->request->is('post')) {
             $reqdata = $this->request->getData();
             //pr($reqdata);exit;
+
             $hfid = $reqdata['hfid'];
             $witness_id = $reqdata['witness_id'];
             $hfupdateflag = $reqdata['hfupdateflag'];
@@ -149,8 +150,10 @@ class WitnessController extends AppController {
                     $reqdata['org_created']=$date('Y-m-d H:i:s');
                 }
             }
+
             $this->save_witness($reqdata,$data, $Selectedtoken, $state_id, $user_id, $hfid, $session_usertype,$witness_id);
             
+
             //pr($fieldlist);
             // $reqdata_send['witness_fields'] = $reqdata;
             //$errarr = $this->validatedata($reqdata, $fieldlist);
@@ -169,7 +172,7 @@ class WitnessController extends AppController {
     
     public function save_witness($reqdata,$data, $Selectedtoken, $state_id, $user_id, $hfid, $session_usertype,$witness_id){
 
-        //pr($hfid);exit;
+            //pr($reqdata);exit;
             $witnessdet = $this->getTableLocator()->get('Witness');
             $witness_add = $witnessdet->newEmptyEntity();
             $this->set('witness_add', $witness_add);
@@ -183,7 +186,7 @@ class WitnessController extends AppController {
             //pr($user_id);
        
 
-            unset($reqdata['data']); 
+            //unset($reqdata['data']); 
             //pr($reqdata);
             $reqdata['witness_full_name_en']=$data['witness_full_name_en'];
             $reqdata['state_id']=$state_id;
@@ -201,18 +204,99 @@ class WitnessController extends AppController {
                 $witness_add = $witnessdet->patchEntity($witness_add, $dataid);
                 $witness_add = $witnessdet->patchEntity($witness_add, $datawitnessid);
                 //pr($witness_add);exit;
-                $witnessdet->save($witness_add);
+                if($witnessdet->save($witness_add)){
+                    if(isset($reqdata['data']['property_details']['pattern_value_en'])){
+                        $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
+                        $behavioral_add = $behavioraldet->newEmptyEntity();
+
+                        //delete records
+                        $behavioraldet->deleteAll(['token_no' => $Selectedtoken,'mapping_ref_id'=>'3', 'mapping_ref_val' => $witness_id]);
+
+                        $pattern_id_array = $reqdata['data']['property_details']['pattern_id'];
+                        $pattern_value_array = $reqdata['data']['property_details']['pattern_value_en'];
+    
+                        for($i=0;$i<sizeof($pattern_id_array);$i++){
+                            //pr($pattern_id_array[$i]);
+                            //pr($pattern_value_array[$i]);
+    
+                            $savearray['token_no']=$Selectedtoken;
+                            $savearray['mapping_ref_id']='3';
+                            $savearray['mapping_ref_val']=$witness_id;
+                            $savearray['user_id']=$user_id;
+                            $savearray['user_type']=$session_usertype;
+                            $savearray['field_id']=$pattern_id_array[$i];
+                            $savearray['field_value_en']=$pattern_value_array[$i];
+                            
+                            //pr($savearray);
+                   
+                            $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
+                            $behavioral_add = $behavioraldet->newEmptyEntity();
+                            $behavioral_add = $witnessdet->patchEntity($behavioral_add, $savearray);
+                            $behavioraldet->save($behavioral_add);
+                        }
+                    }
+                }
+
                 return true;
                 //update record with id= hfid
             }else{
                 //echo 'unset';
                 $action = 'S';
                 $witness_add = $witnessdet->patchEntity($witness_add, $reqdata);
-                pr($witness_add);
-                $witnessdet->save($witness_add);
+                //pr($witness_add);
+                
+                if($witnessdet->save($witness_add))
+                {
+                    $last_id = $witness_add->witness_id;
+                    //pr($reqdata['data']['property_details']['pattern_value_en']);
+                    if(isset($reqdata['data']['property_details']['pattern_value_en'])){
+                        $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
+                        $behavioral_add = $behavioraldet->newEmptyEntity();
+
+                        //delete records
+                        $behavioraldet->deleteAll(['token_no' => $Selectedtoken,'mapping_ref_id'=>'3', 'mapping_ref_val' => $last_id]);
+
+                        $pattern_id_array = $reqdata['data']['property_details']['pattern_id'];
+                        $pattern_value_array = $reqdata['data']['property_details']['pattern_value_en'];
+    
+                        for($i=0;$i<sizeof($pattern_id_array);$i++){
+                            //pr($pattern_id_array[$i]);
+                            //pr($pattern_value_array[$i]);
+    
+                            $savearray['token_no']=$Selectedtoken;
+                            $savearray['mapping_ref_id']='3';
+                            $savearray['mapping_ref_val']=$last_id;
+                            $savearray['user_id']=$user_id;
+                            $savearray['user_type']=$session_usertype;
+                            $savearray['field_id']=$pattern_id_array[$i];
+                            $savearray['field_value_en']=$pattern_value_array[$i];
+                            
+                            //pr($savearray);
+                   
+                            $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
+                            $behavioral_add = $behavioraldet->newEmptyEntity();
+                            $behavioral_add = $witnessdet->patchEntity($behavioral_add, $savearray);
+                            $behavioraldet->save($behavioral_add);
+                        }
+                    }
+                }
+                //exit;
                 return true;
             }
             
+    }
+    public function witnessdelete($witness_id=null) {
+        //pr($witness_id);exit;
+        if (isset($witness_id) && is_numeric($witness_id)) {
+            $witnessrec = $this->getTableLocator()->get('Witness');
+            $entity = $witnessrec->get($witness_id);
+            //pr($entity);exit;
+            $result = $witnessrec->delete($entity);
+            $this->Flash->success(
+                    __('Witness Details Deleted Successfully.')
+            );
+            return $this->redirect(['controller' => 'Witness', 'action' => 'witness']);
+        }
     }
     public function getwitnessfeilds(){
 
@@ -395,10 +479,24 @@ class WitnessController extends AppController {
 
     public function getdependentaddress(){
         try {
+        
+        $Selectedtoken = $this->request->getSession()->read('Selectedtoken');
+        $Selectedtoken='202300000004';
+
         $data = $this->request->getData();
         $ref_id = $data['ref_id'];
         $behavioral_id = $data['behavioral_id'];
         $village_id = $data['village_id'];
+
+        if(isset($data['ref_val_id']))
+        {
+            $ref_val_id = $data['ref_val_id'];
+        }
+        if(isset($data['ref_val_witness_id']))
+        {
+            $ref_val_witness_id = $data['ref_val_witness_id'];
+        }
+
         $village = $this->getTableLocator()->get('Village');
         $behavioral = $this->getTableLocator()->get('Behavioral');
         $behavioraldetails = $this->getTableLocator()->get('BehavioralDetails');
@@ -512,10 +610,10 @@ class WitnessController extends AppController {
 
             }
         }
-        if(isset($data['ref_val']) && is_numeric($data['ref_val'])){
+        if(isset($data['ref_val_witness_id']) && is_numeric($data['ref_val_witness_id'])){
             $trnbehavioral = $this->fetchTable('TrnBehavioralPatterns')
             ->find()
-            ->where(['mapping_ref_id' => $ref_id, 'mapping_ref_val' => $data['ref_val']])
+            ->where(['mapping_ref_id' => $ref_id, 'mapping_ref_val' => $data['ref_val_witness_id'], 'token_no' => $Selectedtoken])
             ->toArray();
             $this->set("trnbehavioral", $trnbehavioral);
         }
