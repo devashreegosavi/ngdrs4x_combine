@@ -40,9 +40,18 @@ class WitnessController extends AppController {
     var $base_path = WWW_ROOT;
 
     public function witness(){
-        $witnessdet = $this->getTableLocator()->get('Witness');
 
-        
+        $this->restrict_edit_after_submit($Selectedtoken);
+        if (!is_numeric($Selectedtoken)) {
+            $this->Flash->success(__('Saved Successfully'));
+                return $this->redirect(['controller' => 'Generalinfo', 'action' => 'generalinfoentry']);
+        }
+        if($reschedule_flag=='Y'){
+            return $this->redirect(['controller' => 'Appointment', 'action' => 'appointment']);
+        }
+
+
+        $witnessdet = $this->getTableLocator()->get('Witness');
         $NGDRSErrorCode = $this->getTableLocator()->get('NGDRSErrorCode');
         $last_status_id = $this->request->getSession()->read('last_status_id');
         $lang = $this->request->getSession()->read('Config.language');
@@ -59,14 +68,7 @@ class WitnessController extends AppController {
                                     ->where(['token_no =' => $Selectedtoken])
                                     ->toArray(); 
         //pr($witness);exit;
-        $this->restrict_edit_after_submit($Selectedtoken);
-        if (!is_numeric($Selectedtoken)) {
-            $this->Flash->success(__('Saved Successfully'));
-                return $this->redirect(['controller' => 'Generalinfo', 'action' => 'generalinfoentry']);
-        }
-        if($reschedule_flag=='Y'){
-            return $this->redirect(['controller' => 'Appointment', 'action' => 'appointment']);
-        }
+        
 
         $popupstatus = $actiontypeval = $hfid = $hfupdateflag = $hfactionval = $witness_id = NULL;
         $this->set(compact('popupstatus', 'actiontypeval', 'hfid','hfupdateflag','hfactionval','state_id','witness','lang','witness_id'));
