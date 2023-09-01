@@ -93,8 +93,28 @@ class IdentificationController extends AppController {
 
         //pr($identifieropt);exit;
         $this->set('identifieropt', $identifieropt);
-        $actiontypeval = $hfid = $hfupdateflag = $popupstatus = NULL;
-        $this->set(compact('actiontypeval', 'hfid','hfupdateflag'));
+        $actiontypeval = $hfid = $hfupdateflag = $popupstatus = $identification_id = NULL;
+        $this->set(compact('actiontypeval', 'hfid','hfupdateflag','identification_id'));
+
+        if ($this->request->is('post')) {
+            $reqdata = $this->request->getData();
+            pr($reqdata);exit;
+
+            $hfid = $reqdata['hfid'];
+            $identification_id = $reqdata['identification_id'];
+            $hfupdateflag = $reqdata['hfupdateflag'];
+
+            if(isset($reqdata['village_id'])){
+                $village_id = $reqdata['village_id'];
+            }
+            else{
+                $village_id = 0;
+            }
+            $fieldlist = $this->fetchTable('IdentificationFields')->fieldlist($lang,$village_id);
+
+
+        }
+
 
     }
 
@@ -204,6 +224,16 @@ class IdentificationController extends AppController {
             'valueField' => 'government_type_' . $lang
         ])->order(['government_type_en' => 'ASC'])->toArray();
         $this->set('gov_partytype', $gov_partytype);
+
+        $allparty= $this->fetchTable('PartyEntry')->find('list', [
+            'keyField' => 'party_id',
+            'valueField' => 'party_full_name_' . $lang
+        ])
+        ->where(['token_no =' => $Selectedtoken])
+        ->order(['party_full_name_en' => 'ASC'])->toArray();
+        $this->set('allparty', $allparty);
+
+        
 
         if(isset($data['type'])){
             if ($data['type'] == 3) {

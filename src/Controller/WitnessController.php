@@ -100,8 +100,14 @@ class WitnessController extends AppController {
             $witness_id = $reqdata['witness_id'];
             $hfupdateflag = $reqdata['hfupdateflag'];
 
-            $village_id = $reqdata['village_id'];
+            if(isset($reqdata['village_id'])){
+                $village_id = $reqdata['village_id'];
+            }
+            else{
+                $village_id = 0;
+            }
             $fieldlist = $this->fetchTable('WitnessFields')->fieldlist($lang,$village_id);
+
             if (isset($reqdata['witness_full_name_en'])){
                 if($reqdata['witness_full_name_en']==''){
                     if(isset($reqdata['fname_en']))

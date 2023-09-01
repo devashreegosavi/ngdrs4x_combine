@@ -35,7 +35,7 @@ echo $this->element("Helper/jqueryhelper");
 <input type='hidden' value='<?php echo $actiontypeval; ?>' name='actiontype' id='actiontype'/>
 <input type='hidden' value='<?php echo $hfid; ?>' name='hfid' id='hfid'/>
 <input type='hidden' value='<?php echo $hfupdateflag; ?>' name='hfupdateflag' id='hfupdateflag'/>
-
+<input type='hidden' value='<?php echo $identification_id; ?>' name='identification_id' id='identification_id'/>
 
 <div class="card card-primary">
     <div class="card-header">

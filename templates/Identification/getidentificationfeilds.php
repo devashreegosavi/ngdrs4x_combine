@@ -98,6 +98,11 @@ $this->Form->create($identifier_fields, ['id' => 'identifier_fields']);
                 <span id="is_executer_error" class="form-error"><?php // echo $errarr['is_executer_error'];              ?></span>
             <?php
             break;
+            case 'party_id': echo $this->Form->select($field['field_id_name_en'], $executer, ['empty' => '--- Select Party ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $identifier[$field['field_id_name_en']]]);
+            ?>
+                <span id="party_id_error" class="form-error"><?php // echo $errarr['party_id_error'];              ?></span>
+            <?php
+            break;
             case 'salutation': echo $this->Form->select($field['field_id_name_en'], $salutation, ['empty' => '--- Select Salutation ---', 'class' => 'form-select', 'id' => $field['field_id_name_en'], 'default' => $identifier[$field['field_id_name_en']] ]);
             ?>
                 <span id="salutation_id_error" class="form-error"><?php // echo $errarr['salutation_id_error'];              ?></span>
