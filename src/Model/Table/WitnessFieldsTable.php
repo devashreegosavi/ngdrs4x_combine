@@ -11,6 +11,7 @@ class WitnessFieldsTable extends Table
         $this->setTable('ngdrstab_mst_witness_fields');
         $this->setPrimaryKey('field_id');
     }
+    
     public function fieldlist($lang, $village_id = NULL) {
 
         $witnessfields = $this->find('all')

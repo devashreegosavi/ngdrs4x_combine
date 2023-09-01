@@ -41,6 +41,10 @@ class WitnessController extends AppController {
 
     public function witness(){
 
+        $reschedule_flag = $this->request->getSession()->read('reschedule_flag');
+        $Selectedtoken = $this->request->getSession()->read('Selectedtoken');
+        $Selectedtoken='202300000004';
+
         $this->restrict_edit_after_submit($Selectedtoken);
         if (!is_numeric($Selectedtoken)) {
             $this->Flash->success(__('Saved Successfully'));
@@ -50,15 +54,11 @@ class WitnessController extends AppController {
             return $this->redirect(['controller' => 'Appointment', 'action' => 'appointment']);
         }
 
-
         $witnessdet = $this->getTableLocator()->get('Witness');
         $NGDRSErrorCode = $this->getTableLocator()->get('NGDRSErrorCode');
         $last_status_id = $this->request->getSession()->read('last_status_id');
         $lang = $this->request->getSession()->read('Config.language');
-        $Selectedtoken = $this->request->getSession()->read('Selectedtoken');
-        $reschedule_flag = $this->request->getSession()->read('reschedule_flag');
         $session_usertype = $this->request->getSession()->read('session_usertype');
-        $Selectedtoken='202300000004';
         $state_id = $this->request->getAttribute('identity')->state_id;
         $user_id = $this->request->getAttribute('identity')->user_id;
         $citizen_user_id = $this->request->getAttribute('identity')->citizen_user_id;
@@ -310,8 +310,7 @@ class WitnessController extends AppController {
         $generalinfodet = $this->getTableLocator()->get('Generalinformation');
         $witnessfieldsdet = $this->getTableLocator()->get('WitnessFields');
         $witnessdet = $this->getTableLocator()->get('Witness');
-        
-        $witnessfieldsdet = $this->getTableLocator()->get('WitnessFields');        
+               
         $witness_fields = $witnessfieldsdet->newEmptyEntity();
         $this->set('witness_fields', $witness_fields);
 
