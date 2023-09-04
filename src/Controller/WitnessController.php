@@ -239,7 +239,7 @@ class WitnessController extends AppController {
                    
                             $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
                             $behavioral_add = $behavioraldet->newEmptyEntity();
-                            $behavioral_add = $witnessdet->patchEntity($behavioral_add, $savearray);
+                            $behavioral_add = $behavioraldet->patchEntity($behavioral_add, $savearray);
                             $behavioraldet->save($behavioral_add);
                         }
                     }
@@ -283,7 +283,7 @@ class WitnessController extends AppController {
                    
                             $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
                             $behavioral_add = $behavioraldet->newEmptyEntity();
-                            $behavioral_add = $witnessdet->patchEntity($behavioral_add, $savearray);
+                            $behavioral_add = $behavioraldet->patchEntity($behavioral_add, $savearray);
                             $behavioraldet->save($behavioral_add);
                         }
                     }

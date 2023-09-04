@@ -379,8 +379,20 @@ $connection = ConnectionManager::get('default');
     }
     function enc($str) {
         $key = "";
-        $enc = openssl_encrypt($str, 'bf-ecb', $key, true);
+        $enc = openssl_encrypt($str, 'bf-ecb', $key);
         $final_str = (bin2hex($enc));
         return ($final_str);
+    }
+
+    function dec($str = NULL) {
+        // pr($str);
+        if (!empty($str) || $str != NULL || $str != '') {
+            $key = "";
+            $final_strv = (hex2bin(trim($str)));
+            $dec = openssl_decrypt($final_strv, 'bf-ecb', $key);
+            return $dec;
+        } else {
+            $str;
+        }
     }
 }

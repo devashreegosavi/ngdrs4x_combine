@@ -165,8 +165,8 @@ $this->Form->create($identifier_fields, ['id' => 'identifier_fields']);
             break;
             default: echo $this->Form->control($field['field_id_name_en'], ['id' => $field['field_id_name_en'], 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off', 'value' => $identifier[$field['field_id_name_en']] ]); 
             ?>
-            <div  class="arrow-up witness_full_name_en_error"></div>
-            <div id="witness_full_name_en_error" class="form-error witness_full_name_en_error"></div> 
+            <div  class="arrow-up identifier_full_name_en_error"></div>
+            <div id="identifier_full_name_en_error" class="form-error identifier_full_name_en_error"></div> 
             <?php
            
         }

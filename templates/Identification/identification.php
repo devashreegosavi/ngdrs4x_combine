@@ -28,6 +28,39 @@ echo $this->element("Helper/jqueryhelper");
         
     });
 
+    function edit_identifier(id,identification_id){
+        //alert(id);
+
+        $.post('<?php
+        echo $this->Url->build([
+            'controller' => 'Identification',
+            'action' => 'getidentificationfeilds',])
+        ?>', {'_csrfToken': $("input[name=_csrfToken]").val(), id : id}, function (data)
+        {
+            //alert(data);
+            $("#witness_fields").html(data);
+            $('#hfid').val(id);
+            $('#identification_id').val(identification_id);
+            $('#hfupdateflag').val('Y');
+
+            if ($('#village_id').length && $("#village_id option:selected").val() != '') {
+                var village_id = $("#village_id option:selected").val();
+                var district_id = $("#district_id option:selected").val();
+                var taluka_id = $("#taluka_id option:selected").val();
+                //alert(village_id);
+                $.post('<?php
+                echo $this->Url->build([
+                    'controller' => 'Identification',
+                    'action' => 'getdependentaddress',])
+                ?>', {district_id: district_id,taluka_id : taluka_id,village_id : village_id,ref_id: '5',behavioral_id : '2', ref_val_id: id, ref_val_identification_id : identification_id , '_csrfToken': $("input[name=_csrfToken]").val()}, function (data)
+                {
+                    //alert(data);
+                    $('.identifieraddress').html(data);
+                });
+            }
+        });
+
+    }
     
 </script>
 <?= $this->Form->create(NULL, ['id' => 'identification']) ?>
@@ -103,3 +136,45 @@ echo $this->element("Helper/jqueryhelper");
             
     </form>
 </div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    Identifier Details
+                </div>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover text-nowrap"  id="datatbl">
+                    <thead>
+                        <tr>
+                            <th>Identifier Name</th>
+                            <th>Identifier Father/Husband Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php for ($i = 0; $i < count($identificationrec); $i++) { ?>
+                        <tr>
+                            <td><?php echo $identificationrec[$i]['identification_full_name_en'];?></td>
+                            <td><?php echo $identificationrec[$i]['father_full_name_en'];?></td>
+                            <td>
+                            <input type="button" id="editdist" class="btn btn-info btn-xs" value="Edit" onclick="javascript: return edit_identifier('<?php echo $identificationrec[$i]['id']; ?>','<?php echo $identificationrec[$i]['identification_id']; ?>');">
+                            <!--<a class='btn btn-info btn-xs' href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a>-->
+                            <!--<a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a>-->
+
+                            <a href="<?php echo $this->Url->build('/Identification/identificationdelete/'. $identificationrec[$i]['identification_id']);?>" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to delete this Identifier ?')">Delete</a>
+
+                            </td>
+                        </tr>
+                        <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<?= $this->Form->end() ?>

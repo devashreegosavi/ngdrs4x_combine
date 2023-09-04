@@ -94,11 +94,11 @@ class IdentificationController extends AppController {
         //pr($identifieropt);exit;
         $this->set('identifieropt', $identifieropt);
         $actiontypeval = $hfid = $hfupdateflag = $popupstatus = $identification_id = NULL;
-        $this->set(compact('actiontypeval', 'hfid','hfupdateflag','identification_id'));
+        $this->set(compact('actiontypeval', 'hfid','hfupdateflag','identification_id','state_id','identificationrec','lang'));
 
         if ($this->request->is('post')) {
             $reqdata = $this->request->getData();
-            pr($reqdata);exit;
+            
 
             $hfid = $reqdata['hfid'];
             $identification_id = $reqdata['identification_id'];
@@ -112,12 +112,146 @@ class IdentificationController extends AppController {
             }
             $fieldlist = $this->fetchTable('IdentificationFields')->fieldlist($lang,$village_id);
 
+            if (isset($reqdata['identification_full_name_en'])){
+                if($reqdata['identification_full_name_en']==''){
+                    if(isset($reqdata['fname_en']))
+                    {
+                        if($reqdata['fname_en']!='')
+                        {        
+                                $reqdata['identification_full_name_en'] = ucwords($reqdata['fname_en']).' '.ucwords($reqdata['mname_en']).' '.ucwords($reqdata['lname_en']);
+                                $reqdata['fname_en'] = ucwords($reqdata['fname_en']);
+                                $reqdata['mname_en'] = ucwords($reqdata['mname_en']);
+                                $reqdata['lname_en'] = ucwords($reqdata['lname_en']);
+                        }
+                    }
+                }
+                else{
+                    $reqdata['identification_full_name_en'] = ucwords($reqdata['identification_full_name_en']);
+                }
+            }
+            else{
+                if (isset($reqdata['fname_en']))
+                {
+                        if($reqdata['fname_en']!='')
+                        {
+                                $reqdata['identification_full_name_en'] = ucwords($reqdata['fname_en']).' '.ucwords($reqdata['mname_en']).' '.ucwords($reqdata['lname_en']);
+                                $reqdata['fname_en'] = ucwords($reqdata['fname_en']);
+                                $reqdata['mname_en'] = ucwords($reqdata['mname_en']);
+                                $reqdata['lname_en'] = ucwords($reqdata['lname_en']);
+
+                        }
+                }
+            }
+
+            if(isset($reqdata['uid_no']))
+            {
+                $reqdata['uid_no']=$this->enc($reqdata['uid_no']);
+            }
+            
+            //pr($reqdata);exit;
+            $this->save_identifier($reqdata, $Selectedtoken, $state_id, $user_id, $hfid, $session_usertype,$identification_id);
+
+            if($hfid!='')
+            {
+                $this->Flash->success(__('Identifier Details Updated Successfully'));
+            }
+            else{
+                $this->Flash->success(__('Identifier Details Saved Successfully'));
+            }
+            return $this->redirect(['controller' => 'Identification', 'action' => 'identification']);
 
         }
 
 
     }
 
+    public function save_identifier($reqdata, $Selectedtoken, $state_id, $user_id, $hfid, $session_usertype,$identification_id){
+        $identificationdet = $this->getTableLocator()->get('Identification');
+        $identification_add = $identificationdet->newEmptyEntity();
+        $this->set('identification_add', $identification_add);
+        $identificationfieldsdet = $this->getTableLocator()->get('IdentificationFields');       
+        $pan = isset($reqdata['pan_no']) ? ($reqdata['pan_no']) : ('');
+        $mobile = isset($reqdata['mobile_no']) ? ($reqdata['mobile_no']) : ('');
+        $uid = isset($reqdata['uid_no']) ? ($reqdata['uid_no']) : ('');
+        $email = isset($reqdata['email_id']) ? ($reqdata['email_id']) : ('');
+
+        $reqdata['state_id']=$state_id;
+        $reqdata['user_id']=$user_id;
+        if(isset($session_usertype)){
+            $reqdata['user_type']=$session_usertype;
+        }
+       
+
+        if($session_usertype=='O')
+        {
+            if($identification_id!='' && is_numeric($identification_id)){
+                $reqdata['org_updated']=date('Y-m-d H:i:s');
+                $reqdata['updated']=date('Y-m-d H:i:s');
+            }else{
+                $reqdata['org_created']=date('Y-m-d H:i:s');
+                $reqdata['created']=date('Y-m-d H:i:s');
+            }
+        }
+
+        if (isset($hfid) && $hfid!='') {
+
+        }else{
+                $action = 'S';
+                $identifier_add = $identificationdet->patchEntity($identification_add, $reqdata);
+                if($identificationdet->save($identifier_add))
+                {
+                    $last_id = $identifier_add->identification_id;
+
+                    if(isset($reqdata['data']['property_details']['pattern_value_en'])){
+                        $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
+                        $behavioral_add = $behavioraldet->newEmptyEntity();
+
+                        //delete records
+                        $behavioraldet->deleteAll(['token_no' => $Selectedtoken,'mapping_ref_id'=>'5', 'mapping_ref_val' => $last_id]);
+
+                        $pattern_id_array = $reqdata['data']['property_details']['pattern_id'];
+                        $pattern_value_array = $reqdata['data']['property_details']['pattern_value_en'];
+    
+                        for($i=0;$i<sizeof($pattern_id_array);$i++){
+                            //pr($pattern_id_array[$i]);
+                            //pr($pattern_value_array[$i]);
+    
+                            $savearray['token_no']=$Selectedtoken;
+                            $savearray['mapping_ref_id']='5';
+                            $savearray['mapping_ref_val']=$last_id;
+                            $savearray['user_id']=$user_id;
+                            $savearray['user_type']=$session_usertype;
+                            $savearray['field_id']=$pattern_id_array[$i];
+                            $savearray['field_value_en']=$pattern_value_array[$i];
+                            
+                            //pr($savearray);
+                   
+                            $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
+                            $behavioral_add = $behavioraldet->newEmptyEntity();
+                            $behavioral_add = $behavioraldet->patchEntity($behavioral_add, $savearray);
+                            $behavioraldet->save($behavioral_add);
+                        }
+                    }
+                }
+                return true;
+        }
+
+
+    }
+
+    public function identificationdelete($identification_id=null) {
+        //pr($witness_id);exit;
+        if (isset($identification_id) && is_numeric($identification_id)) {
+            $identificationrec = $this->getTableLocator()->get('Identification');
+            $entity = $identificationrec->get($identification_id);
+            //pr($entity);exit;
+            $result = $identificationrec->delete($entity);
+            $this->Flash->success(
+                    __('Identifier Details Deleted Successfully.')
+            );
+            return $this->redirect(['controller' => 'Identification', 'action' => 'identification']);
+        }
+    }
     public function getidentificationfeilds(){
         $data = $this->request->getData();
         
@@ -319,9 +453,9 @@ class IdentificationController extends AppController {
         {
             $ref_val_id = $data['ref_val_id'];
         }
-        if(isset($data['ref_val_identifier_id']))
+        if(isset($data['ref_val_identification_id']))
         {
-            $ref_val_identifier_id = $data['ref_val_identifier_id'];
+            $ref_val_identification_id = $data['ref_val_identification_id'];
         }
 
         $village = $this->getTableLocator()->get('Village');
@@ -437,14 +571,14 @@ class IdentificationController extends AppController {
 
             }
         }
-        if(isset($data['ref_val_identifier_id']) && is_numeric($data['ref_val_identifier_id'])){
+        if(isset($data['ref_val_identification_id']) && is_numeric($data['ref_val_identification_id'])){
             $trnbehavioral = $this->fetchTable('TrnBehavioralPatterns')
             ->find()
-            ->where(['mapping_ref_id' => $ref_id, 'mapping_ref_val' => $data['ref_val_identifier_id'], 'token_no' => $Selectedtoken])
+            ->where(['mapping_ref_id' => $ref_id, 'mapping_ref_val' => $data['ref_val_identification_id'], 'token_no' => $Selectedtoken])
             ->toArray();
-            $this->set("trnbehavioral", $trnbehavioral);
+            
         }
-        
+        $this->set("trnbehavioral", $trnbehavioral);
         } catch (Exception $exc) {
             echo $exc->getTraceAsString();
         }
