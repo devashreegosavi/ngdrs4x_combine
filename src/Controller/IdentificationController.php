@@ -194,7 +194,47 @@ class IdentificationController extends AppController {
         }
 
         if (isset($hfid) && $hfid!='') {
+            $action = 'U';
+            $dataid = ['id' => $hfid]; 
+            $dataidentificationid = ['identification_id' => $identification_id]; 
+            $identification_add = $identificationdet->patchEntity($identification_add, $reqdata);
+            $identification_add = $identificationdet->patchEntity($identification_add, $dataid);
+            $identification_add = $identificationdet->patchEntity($identification_add, $dataidentificationid);
+            //pr($witness_add);exit;
+            if($identificationdet->save($identification_add)){
+                if(isset($reqdata['data']['property_details']['pattern_value_en'])){
+                    $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
+                    $behavioral_add = $behavioraldet->newEmptyEntity();
 
+                    //delete records
+                    $behavioraldet->deleteAll(['token_no' => $Selectedtoken,'mapping_ref_id'=>'5', 'mapping_ref_val' => $identification_id]);
+
+                    $pattern_id_array = $reqdata['data']['property_details']['pattern_id'];
+                    $pattern_value_array = $reqdata['data']['property_details']['pattern_value_en'];
+
+                    for($i=0;$i<sizeof($pattern_id_array);$i++){
+                        //pr($pattern_id_array[$i]);
+                        //pr($pattern_value_array[$i]);
+
+                        $savearray['token_no']=$Selectedtoken;
+                        $savearray['mapping_ref_id']='5';
+                        $savearray['mapping_ref_val']=$identification_id;
+                        $savearray['user_id']=$user_id;
+                        $savearray['user_type']=$session_usertype;
+                        $savearray['field_id']=$pattern_id_array[$i];
+                        $savearray['field_value_en']=$pattern_value_array[$i];
+                        
+                        //pr($savearray);
+               
+                        $behavioraldet = $this->getTableLocator()->get('TrnBehavioralPatterns');
+                        $behavioral_add = $behavioraldet->newEmptyEntity();
+                        $behavioral_add = $behavioraldet->patchEntity($behavioral_add, $savearray);
+                        $behavioraldet->save($behavioral_add);
+                    }
+                }
+            }
+
+            return true;
         }else{
                 $action = 'S';
                 $identifier_add = $identificationdet->patchEntity($identification_add, $reqdata);
@@ -399,6 +439,18 @@ class IdentificationController extends AppController {
         $this->set('fieldlistmultiform', $fieldlist);
         //pr($this->getvalidationruleset($fieldlist, TRUE));
         $this->set('result_codes', $this->getvalidationruleset($fieldlist, TRUE));
+
+        if (isset($data['id']) && is_numeric($data['id'])) {
+            //pr($data['id']);exit;
+            $identifier_id = $data['id'];
+            $identifierarr = $this->fetchTable('Identification')
+                            ->find('all')
+                            ->where(['token_no =' => $Selectedtoken,'id' => $identifier_id])
+                            ->toArray(); 
+            //pr($witnessarr);
+            $this->set('identifierarr', $identifierarr);
+
+        }
         
     }
 
@@ -571,14 +623,14 @@ class IdentificationController extends AppController {
 
             }
         }
-        if(isset($data['ref_val_identification_id']) && is_numeric($data['ref_val_identification_id'])){
+            if(isset($data['ref_val_identification_id']) && is_numeric($data['ref_val_identification_id'])){
             $trnbehavioral = $this->fetchTable('TrnBehavioralPatterns')
             ->find()
             ->where(['mapping_ref_id' => $ref_id, 'mapping_ref_val' => $data['ref_val_identification_id'], 'token_no' => $Selectedtoken])
             ->toArray();
             
-        }
-        $this->set("trnbehavioral", $trnbehavioral);
+            }
+            $this->set("trnbehavioral", $trnbehavioral);
         } catch (Exception $exc) {
             echo $exc->getTraceAsString();
         }

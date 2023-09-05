@@ -63,6 +63,30 @@ echo $this->element("Helper/jqueryhelper");
         
         });
 
+        $('#dob').datepicker({
+            maxDate: '+0d',
+            yearRange: '1920:2010',
+            changeMonth: true,
+            changeYear: true,
+             format: "dd-mm-yyyy"
+        });
+        $("#dob").change(function ()
+        {
+
+            var dateString = $("#dob").val();
+             var d1 = dateString.split("-");
+           var dateString = d1[1]+'/'+d1[0]+'/'+d1[2];
+            var today = new Date();
+            var birthDate = new Date(dateString);
+            var age = today.getFullYear() - birthDate.getFullYear();
+            var m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate()))
+            {
+                age--;
+            }
+            $("#age").val(age);
+        });
+        
         
     });
 </script>  
@@ -163,7 +187,34 @@ $this->Form->create($identifier_fields, ['id' => 'identifier_fields']);
                 <span id="homevisit_flag_error" class="form-error"><?php //echo $errarr['homevisit_flag_error'];              ?></span>
             <?php
             break;
-            default: echo $this->Form->control($field['field_id_name_en'], ['id' => $field['field_id_name_en'], 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off', 'value' => $identifier[$field['field_id_name_en']] ]); 
+            default: 
+                if (isset($identifierarr) && !empty($identifierarr)) {
+                    if($field['field_id_name_en']=='uid_no')
+                    {
+                        //$textval = $this->requestAction('AppController/enc/'.$identifier[$field['field_id_name_en']]);
+                        //$textval = AppController::enc($identifier[$field['field_id_name_en']]);
+                        //$vara = new AppController();
+                        //$textval = $vara->enc($identifier[$field['field_id_name_en']]);
+
+                        //$textval = $this->Url->build('/App/dec/'. $identifier[$field['field_id_name_en']]);
+
+                        /*App::import('controller','App');
+                        $varobj = new AppController;
+                        $textval = $varobj->enc($identifier[$field['field_id_name_en']]);*/
+
+                        $str = $identifier[$field['field_id_name_en']];
+                        $key = "";
+                        $final_strv = (hex2bin(trim($str)));
+                        $textval = openssl_decrypt($final_strv, 'bf-ecb', $key);
+
+                    }
+                    else
+                        $textval = $identifier[$field['field_id_name_en']];
+                }
+                else{
+                    $textval = '';
+                }
+                echo $this->Form->control($field['field_id_name_en'], ['id' => $field['field_id_name_en'], 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off', 'value' => $textval ]); 
             ?>
             <div  class="arrow-up identifier_full_name_en_error"></div>
             <div id="identifier_full_name_en_error" class="form-error identifier_full_name_en_error"></div> 

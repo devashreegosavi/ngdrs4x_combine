@@ -28,7 +28,7 @@ echo $this->element("Helper/jqueryhelper");
         
     });
 
-    function edit_identifier(id,identification_id){
+    function edit_identifier(id,identification_id, type){
         //alert(id);
 
         $.post('<?php
@@ -38,11 +38,12 @@ echo $this->element("Helper/jqueryhelper");
         ?>', {'_csrfToken': $("input[name=_csrfToken]").val(), id : id}, function (data)
         {
             //alert(data);
-            $("#witness_fields").html(data);
+            $("#identification_fields").html(data);
             $('#hfid').val(id);
             $('#identification_id').val(identification_id);
             $('#hfupdateflag').val('Y');
-
+            $("#identifire_type").val(type);
+            
             if ($('#village_id').length && $("#village_id option:selected").val() != '') {
                 var village_id = $("#village_id option:selected").val();
                 var district_id = $("#district_id option:selected").val();
@@ -160,7 +161,7 @@ echo $this->element("Helper/jqueryhelper");
                             <td><?php echo $identificationrec[$i]['identification_full_name_en'];?></td>
                             <td><?php echo $identificationrec[$i]['father_full_name_en'];?></td>
                             <td>
-                            <input type="button" id="editdist" class="btn btn-info btn-xs" value="Edit" onclick="javascript: return edit_identifier('<?php echo $identificationrec[$i]['id']; ?>','<?php echo $identificationrec[$i]['identification_id']; ?>');">
+                            <input type="button" id="editdist" class="btn btn-info btn-xs" value="Edit" onclick="javascript: return edit_identifier('<?php echo $identificationrec[$i]['id']; ?>','<?php echo $identificationrec[$i]['identification_id']; ?>','<?php echo $identificationrec[$i]['identifire_type']; ?>');">
                             <!--<a class='btn btn-info btn-xs' href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a>-->
                             <!--<a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Delete</a>-->
 
