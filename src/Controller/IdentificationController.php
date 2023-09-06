@@ -636,4 +636,35 @@ class IdentificationController extends AppController {
         }
     }
 
+    public function getvalidationrule(){
+        //pr('aaaaaaaaaaaaaa');exit;
+        $lang = $this->request->getSession()->read('Config.language');
+        $data = $this->request->getData();
+        $this->autoRender = FALSE;
+        $data_sent = array();
+        if(isset($data['type'])){
+            $typeid = $data['type'];
+            $allrule = $this->fetchTable('IdentificationType')
+                    ->find()
+                    ->select(['NGDRSErrorCode.error_code' ,'NGDRSErrorCode.pattern_rule_client' ,'NGDRSErrorCode.error_messages_' . $lang])
+                    ->join([
+                        'NGDRSErrorCode' => [
+                            'table' => 'ngdrstab_mst_errorcodes',
+                            'type' => 'INNER',
+                            'conditions' => 'IdentificationType.error_code_id = NGDRSErrorCode.error_code_id',
+                        ]
+                    ])
+                    ->where(['identificationtype_id' => $typeid])
+                    ->toArray();
+            //pr($allrule);
+            $data_sent['message'] = $allrule[0]['NGDRSErrorCode']['error_messages_'.$lang];
+            $data_sent['pattern'] = $allrule[0]['NGDRSErrorCode']['pattern_rule_client'];
+            $data_sent['error_code'] = $allrule[0]['NGDRSErrorCode']['error_code'];
+            echo json_encode($data_sent);
+            exit;
+        }
+
+        
+    }
+
 }

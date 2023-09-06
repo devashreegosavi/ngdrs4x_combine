@@ -11,6 +11,8 @@ echo $this->element("Helper/jqueryhelper");
                 "aLengthMenu": [[5, 10, 15, 20, - 1], [5, 10, 15, 20, "All"]]
         });
 
+            
+
         $('#district_id').change(function () {
             var district_id = $('#district_id').val();
             //alert(district_id);
@@ -87,6 +89,32 @@ echo $this->element("Helper/jqueryhelper");
             $("#age").val(age);
         });
         
+       $("#identificationtype_desc_en").blur(function () {
+            var type = $("#identificationtype_id option:selected").val();
+            var desc = $("#identificationtype_desc_en").val();
+            
+            if (type != '')
+            {
+                $.postJSON('getvalidationrule', {type: type, '_csrfToken': $("input[name=_csrfToken]").val()}, function (data)
+                {
+                    var pattern = $.trim(data.pattern);
+                    var message = data.message;
+                    var error_code = data.error_code;
+                    
+                    if (!desc.match(pattern))
+                    {
+                        $("#identificationtype_desc_en").val('');
+                        // $("#identificationtype_desc_en").focus();
+                        $("#identificationtype_desc_en_error").text(message);
+                        return false;
+                    } else
+                    {
+                        $("#identificationtype_desc_en_error").text('');
+                        return true;
+                    }
+                });
+            }
+        });
         
     });
 </script>  
@@ -216,8 +244,8 @@ $this->Form->create($identifier_fields, ['id' => 'identifier_fields']);
                 }
                 echo $this->Form->control($field['field_id_name_en'], ['id' => $field['field_id_name_en'], 'class' => 'form-control', 'label' => false, 'autocomplete' => 'off', 'value' => $textval ]); 
             ?>
-            <div  class="arrow-up identifier_full_name_en_error"></div>
-            <div id="identifier_full_name_en_error" class="form-error identifier_full_name_en_error"></div> 
+            <div  class="arrow-up <?php echo $field['field_id_name_en']; ?>_error"></div>
+            <div id="<?php echo $field['field_id_name_en']; ?>_error" class="form-error <?php echo $field['field_id_name_en']; ?>_error"></div> 
             <?php
            
         }
