@@ -9,6 +9,8 @@
         <?php
         echo $this->element("Helper/jqueryhelper");
         ?>
+        <?= $this->Html->script('jQueryUI/jquery-ui.min'); ?>                      
+        <?= $this->Html->css('Dev_Define'); ?>
     </head>
 
     <body class="sidebar-mini pace-primary pace-done layout-fixed">

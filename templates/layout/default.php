@@ -6,11 +6,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-        <?= $this->Html->css(['../vendor/bootstrap/css/bootstrap.min', 'user/base', 'user/base-responsive', 'user/animate.min', 'user/slicknav.min', 'user/all-site-style', '../vendor/fontawesome/css/all.min.css','ngdrstyle.css']) ?>
+        <?= $this->Html->css(['../vendor/bootstrap/css/bootstrap.min', 'user/base', 'user/base-responsive', 'user/animate.min', 'user/slicknav.min', 'user/all-site-style', '../vendor/fontawesome/css/all.min.css','ngdrstyle.css','Dev_Define.css']) ?>
 
          <?= $this->fetch('css') ?>
          <?= $this->Html->script(['jquery-3.6.1']) ?>
 		 <?= $this->Html->script(['crypto']) ?>
+         <?= $this->Html->script('jQueryUI/jquery-ui.min'); ?>                      
     </head>
 
     <body>
